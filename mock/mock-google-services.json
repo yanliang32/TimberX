@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "942876862120",
+    "project_id": "ylmediaplay",
+    "storage_bucket": "ylmediaplay.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942876862120:android:a01e43591aacdc6c6c049d",
+        "android_client_info": {
+          "package_name": "com.naman14.timberx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942876862120-7vo4u15kij9o9ike2oolcueoeam3begi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChHpfr_Z2xZWVzOVbvfJnxolC5sPe9Hgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942876862120-7vo4u15kij9o9ike2oolcueoeam3begi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
