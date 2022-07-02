@@ -15,11 +15,18 @@
 package com.naman14.timberx.playback.players
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.PowerManager
+import android.util.Log
+import androidx.preference.PreferenceManager
+import com.blankj.utilcode.util.UriUtils
+import com.zj.jplayercore.controller.JEqparam
+import com.zj.jplayercore.controller.JPlayer
 import timber.log.Timber
+
 
 typealias OnPrepared<T> = T.() -> Unit
 typealias OnError<T> = T.(error: Throwable) -> Unit
@@ -60,15 +67,29 @@ interface MusicPlayer {
     fun onError(error: OnError<MusicPlayer>)
 
     fun onCompletion(completion: OnCompletion<MusicPlayer>)
+
+    fun setSampleRate(sampleRate: Int)
+
+    fun setEnabledEffect(enabledEffect: Boolean)
+
+    fun setEnabledStereoWidth(enabledStereoWidth: Boolean)
+
+    fun setStereoWidth(stereoWidth: Float)
+
+    fun setEnabledChafen(enabledChafen: Boolean)
+
+    fun setChafenDelay(chafenDelay: Int)
+
+    fun setEqparam(eqparam: String)
 }
 
 class RealMusicPlayer(internal val context: Application) : MusicPlayer,
-        MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener {
+    JPlayer.OnPreparedListener,
+    JPlayer.OnErrorListener,
+    JPlayer.OnCompletionListener {
 
-    private var _player: MediaPlayer? = null
-    private val player: MediaPlayer
+    private var _player: JPlayer? = null
+    private val player: JPlayer
         get() {
             if (_player == null) {
                 _player = createPlayer(this)
@@ -80,6 +101,7 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
     private var onPrepared: OnPrepared<MusicPlayer> = {}
     private var onError: OnError<MusicPlayer> = {}
     private var onCompletion: OnCompletion<MusicPlayer> = {}
+    private val jEqparams = arrayListOf<JEqparam>()
 
     override fun play() {
         Timber.d("play()")
@@ -101,7 +123,11 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
     override fun setSource(uri: Uri): Boolean {
         Timber.d("setSource() - $uri")
         try {
-            player.setDataSource(context, uri)
+            val file = UriUtils.uri2File(uri)
+            if (null == file || !file.exists()) {
+                RuntimeException("读取文件有误")
+            }
+            player.setDataSource(file!!.absolutePath)
         } catch (e: Exception) {
             Timber.d("setSource() - failed")
             onError(this, e)
@@ -112,7 +138,7 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
 
     override fun prepare() {
         Timber.d("prepare()")
-        player.prepareAsync()
+        player.prepare()
     }
 
     override fun seekTo(position: Int) {
@@ -161,34 +187,103 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
 
     // Callbacks from stock MediaPlayer...
 
-    override fun onPrepared(mp: MediaPlayer?) {
+    override fun onPrepared(mp: JPlayer?) {
         Timber.d("onPrepared()")
         didPrepare = true
         onPrepared(this)
     }
 
-    override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
+    override fun onError(mp: JPlayer?, what: Int, extra: Int): Boolean {
         didPrepare = false
         Timber.d("onError() - what = $what, extra = $extra")
         return false
     }
 
-    override fun onCompletion(mp: MediaPlayer?) {
+    override fun onCompletion(mp: JPlayer?) {
         Timber.d("onCompletion()")
         onCompletion(this)
     }
+
+    override fun setSampleRate(sampleRate: Int) {
+        player.changeSampleRate(sampleRate)
+        Timber.d("setSampleRate: $sampleRate")
+    }
+
+    override fun setEnabledEffect(enabledEffect: Boolean) {
+        JPlayer.jConfig.isEnabledEffect = enabledEffect
+
+        Timber.d("setEnabledEffect: $enabledEffect")
+    }
+
+    override fun setEnabledStereoWidth(enabledStereoWidth: Boolean) {
+        JPlayer.jConfig.isEnabledStereoWidth = enabledStereoWidth
+
+        Timber.d("enabledStereoWidth: $enabledStereoWidth")
+    }
+
+    override fun setStereoWidth(stereoWidth: Float) {
+        JPlayer.jConfig.setStereoWidth(stereoWidth)
+
+        Timber.d("setStereoWidth: $stereoWidth")
+    }
+
+    override fun setEnabledChafen(enabledChafen: Boolean) {
+        JPlayer.jConfig.isEnabledChafen = enabledChafen
+        Timber.d("setEnabledChafen: $enabledChafen")
+    }
+
+    override fun setChafenDelay(chafenDelay: Int) {
+        JPlayer.jConfig.setChafenDelay(chafenDelay)
+        Timber.d("setChafenDelay: $chafenDelay")
+    }
+
+    override fun setEqparam(eqparam: String) {
+        jEqparams.clear()
+        var eqList : List<String>
+        if(eqparam.contains("\r\n")) {
+            eqList = eqparam.split("\r\n")
+        }
+        else
+        {
+            eqList = eqparam.split("\n")
+        }
+        var preCut = "0"
+        val precut = eqList[eqList.size - 1].split(" ").toTypedArray()
+        if (precut[0] == "precut") {
+            preCut = precut[1]
+        }
+        for (a in eqList) {
+            val filter = a.split(" ").toTypedArray()
+            if (filter.size == 5 && filter[0] == "filter") {
+                val eq1 = JEqparam()
+                eq1.setFreq(filter[2].toDouble())
+                eq1.setPeak(filter[4].toDouble())
+                eq1.setQ(filter[3].toDouble())
+                eq1.setPrecut(preCut.toDouble())
+                jEqparams.add(eq1)
+
+            }
+        }
+        if (jEqparams != null && jEqparams.size>0) {
+            player.loadEQ(jEqparams)
+        }
+        Timber.d("setEqparam: $eqparam")
+    }
 }
 
-private fun createPlayer(owner: RealMusicPlayer): MediaPlayer {
-    return MediaPlayer().apply {
+private fun createPlayer(owner: RealMusicPlayer): JPlayer {
+
+    return JPlayer().apply {
         setWakeMode(owner.context, PowerManager.PARTIAL_WAKE_LOCK)
         val attr = AudioAttributes.Builder().apply {
             setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             setUsage(AudioAttributes.USAGE_MEDIA)
         }.build()
-        setAudioAttributes(attr)
+        //createAudioTrack(attr)
         setOnPreparedListener(owner)
         setOnCompletionListener(owner)
         setOnErrorListener(owner)
     }
+
+
 }

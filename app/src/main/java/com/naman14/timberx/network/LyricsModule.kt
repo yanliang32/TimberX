@@ -21,7 +21,7 @@ import org.koin.dsl.module.module
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
-private const val LYRICS_API_HOST = "https://makeitpersonal.co"
+private const val LYRICS_API_HOST = "https://netease-cloud-music-api-rose-eight.vercel.app"
 
 val lyricsModule = module {
 

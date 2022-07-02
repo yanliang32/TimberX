@@ -67,7 +67,7 @@ class LyricsFragment : BaseNowPlayingFragment() {
         binding.songTitle = songTitle
 
         // TODO make the lyrics handler/repo injectable
-        lyricsService.getLyrics(artistName, songTitle)
+        lyricsService.getLyrics("347230")
                 .ioToMain()
                 .subscribeForOutcome { outcome ->
                     when (outcome) {

@@ -22,6 +22,7 @@ import retrofit2.http.Query
 interface LyricsRestService {
 
     @Headers("Cache-Control: public")
-    @GET("/lyrics")
-    fun getLyrics(@Query("artist") artist: String, @Query("title") title: String): Observable<String>
+    @GET("/lyric")
+    //fun getLyrics(@Query("artist") artist: String, @Query("title") title: String): Observable<String>
+    fun getLyrics(@Query("id") id: String): Observable<String>
 }

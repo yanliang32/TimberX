@@ -17,36 +17,99 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ListPreference
-        android:defaultValue="light"
-        android:entries="@array/pref_theme_entries"
-        android:entryValues="@array/pref_theme_values"
-        android:key="theme_preference"
-        android:summary="@string/choose_theme"
-        android:title="@string/theme"
-        app:iconSpaceReserved="false" />
+    <PreferenceCategory android:title="外观设置"
+        app:iconSpaceReserved="false">
+        <ListPreference
+            android:defaultValue="light"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="theme_preference"
+            android:summary="@string/choose_theme"
+            android:title="@string/theme"
+            app:iconSpaceReserved="false" />
 
-    <ListPreference
-        android:defaultValue="songs"
-        android:entries="@array/pref_startpage_entries"
-        android:entryValues="@array/pref_startpage_values"
-        android:key="start_page_preference"
-        android:summary="@string/choose_start_page"
-        android:title="@string/start_page"
-        app:iconSpaceReserved="false" />
+        <ListPreference
+            android:defaultValue="songs"
+            android:entries="@array/pref_startpage_entries"
+            android:entryValues="@array/pref_startpage_values"
+            android:key="start_page_preference"
+            android:summary="@string/choose_start_page"
+            android:title="@string/start_page"
+            app:iconSpaceReserved="false" />
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="lastfm_artist_image"
-        android:summary="@string/load_artist_image_summary"
-        android:title="@string/load_artist_image"
-        app:iconSpaceReserved="false" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="lastfm_artist_image"
+            android:summary="@string/load_artist_image_summary"
+            android:title="@string/load_artist_image"
+            app:iconSpaceReserved="false" />
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="lastfm_album_image"
-        android:summary="@string/load_album_image_summary"
-        android:title="@string/load_album_image"
-        app:iconSpaceReserved="false" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="lastfm_album_image"
+            android:summary="@string/load_album_image_summary"
+            android:title="@string/load_album_image"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="音效设置"
+        app:iconSpaceReserved="false">
+        <ListPreference
+            android:defaultValue="44100"
+            android:entries="@array/samplerate_values"
+            android:entryValues="@array/samplerate_values"
+            android:key="set_samplerate_preference"
+            android:summary="选择采样率"
+            android:title="采样率"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_enabled_effect_preference"
+            android:summary="@string/set_enabled_effect"
+            android:title="@string/set_enabled_effect"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue="filter 0 80 0.7 2.5\nfilter 1 200 1 -4\nfilter 2 800 1 -7.5\nfilter 3 3980 1 0\nfilter 4 11930 0.7 1"
+            android:key="set_eqparam"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="编辑EQ"
+            app:iconSpaceReserved="false" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_enabled_stereo_width_preference"
+            android:summary="设置是否开启声场"
+            android:title="启用声场"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="10"
+            android:entries="@array/stereo_width_values"
+            android:entryValues="@array/stereo_width_values"
+            android:key="set_stereo_width_preference"
+            android:summary="选择声场大小"
+            android:title="声场数值"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_enabled_chafen_preference"
+            android:summary="设置是否开启差分"
+            android:title="启用差分"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="20"
+            android:entries="@array/enabled_chafen_values"
+            android:entryValues="@array/enabled_chafen_values"
+            android:key="set_chafen_preference"
+            android:summary="选择差分大小"
+            android:title="差分数值"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

@@ -17,6 +17,7 @@ package com.naman14.timberx.playback.players
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -52,6 +53,7 @@ import android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED
 import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
 import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import com.naman14.timberx.R
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_QUEUE
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_SONG
@@ -126,6 +128,20 @@ interface SongPlayer {
     fun setPlaybackState(state: PlaybackStateCompat)
 
     fun restoreFromQueueData(queueData: QueueEntity)
+
+    fun setSampleRate(sampleRate: Int)
+
+    fun setEnabledEffect(enabledEffect: Boolean)
+
+    fun setEnabledStereoWidth(enabledStereoWidth: Boolean)
+
+    fun setStereoWidth(stereoWidth: Float)
+
+    fun setEnabledChafen(enabledChafen: Boolean)
+
+    fun setChafenDelay(chafenDelay: Int)
+
+    fun setEqparam(eqparam: String)
 }
 
 class RealSongPlayer(
@@ -162,6 +178,18 @@ class RealSongPlayer(
 
     init {
         queue.setMediaSession(mediaSession)
+
+        val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+        setEqparam(sp.getString("set_eqparam",""))
+        sp.getString("set_stereo_width_preference", "10")?.toFloat()
+            ?.let { setStereoWidth(it) };
+        setEnabledEffect(sp.getBoolean("set_enabled_effect_preference", false));
+        setEnabledStereoWidth(sp.getBoolean("set_enabled_stereo_width_preference", false));
+        sp.getString("set_samplerate_preference", "44100")?.toInt()
+            ?.let { setSampleRate(it) }
+        setEnabledChafen(sp.getBoolean("set_enabled_chafen_preference", false))
+        sp.getString("set_chafen_preference", "20")?.toInt()
+            ?.let { setChafenDelay(it) }
 
         musicPlayer.onPrepared {
             preparedCallback(this@RealSongPlayer)
@@ -296,6 +324,7 @@ class RealSongPlayer(
         updatePlaybackState {
             setState(STATE_STOPPED, 0, 1F)
         }
+        musicPlayer.prepare()
         playSong(queue.currentSong())
     }
 
@@ -402,6 +431,39 @@ class RealSongPlayer(
             setState(playbackState, currentPos, 1F)
             setExtras(extras)
         }
+    }
+
+    override fun setSampleRate(sampleRate: Int) {
+        musicPlayer.setSampleRate(sampleRate)
+//        musicPlayer.stop()
+//        updatePlaybackState {
+//            setState(STATE_NONE, 0, 1F)
+//        }
+        //musicPlayer.prepare()
+    }
+
+    override fun setEnabledEffect(enabledEffect: Boolean) {
+        musicPlayer.setEnabledEffect(enabledEffect)
+    }
+
+    override fun setEnabledStereoWidth(enabledStereoWidth: Boolean) {
+        musicPlayer.setEnabledStereoWidth(enabledStereoWidth)
+    }
+
+    override fun setStereoWidth(stereoWidth: Float) {
+        musicPlayer.setStereoWidth(stereoWidth)
+    }
+
+    override fun setEnabledChafen(enabledChafen: Boolean) {
+        musicPlayer.setEnabledChafen(enabledChafen)
+    }
+
+    override fun setChafenDelay(chafenDelay: Int) {
+        musicPlayer.setChafenDelay(chafenDelay)
+    }
+
+    override fun setEqparam(eqparam: String) {
+        musicPlayer.setEqparam(eqparam)
     }
 
     private fun setMetaData(song: Song) {
