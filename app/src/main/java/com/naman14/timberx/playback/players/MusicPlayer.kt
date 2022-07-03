@@ -205,7 +205,7 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
     }
 
     override fun setSampleRate(sampleRate: Int) {
-        player.changeSampleRate(sampleRate)
+        JPlayer.jConfig.setSampleRate(sampleRate)
         Timber.d("setSampleRate: $sampleRate")
     }
 

@@ -25,6 +25,7 @@ object Constants {
     const val ACTION_SET_STEREO_WIDTH = "action_set_stereo_width"
     const val ACTION_SET_ENABLED_CHAFEN = "action_set_enabled_chafen"
     const val ACTION_SET_CHAFEN = "action_set_chafen"
+    const val ACTION_SELECT_EQPARAM = "action_select_eqparam"
     const val ACTION_SET_EQPARAM = "action_set_eqparam"
     const val ACTION_REPEAT_SONG = "action_repeat_song"
     const val ACTION_REPEAT_QUEUE = "action_repeat_queue"
@@ -56,4 +57,5 @@ object Constants {
     const val ENABLED_CHAFEN = "enabled_chafen"
     const val CHAFEN = "chafen"
     const val EQPARAM = "eqparam"
+    const val PRESETEQ = "preseteq"
 }

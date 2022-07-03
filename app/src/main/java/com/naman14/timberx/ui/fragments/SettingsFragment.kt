@@ -19,6 +19,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.naman14.timberx.R
 import com.naman14.timberx.constants.Constants
+import com.naman14.timberx.constants.Constants.ACTION_SELECT_EQPARAM
 import com.naman14.timberx.constants.Constants.ACTION_SET_CHAFEN
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_CHAFEN
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_EFFECT
@@ -44,6 +45,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         findPreference("set_stereo_width_preference")?.onPreferenceChangeListener = this
         findPreference("set_enabled_chafen_preference")?.onPreferenceChangeListener = this
         findPreference("set_chafen_preference")?.onPreferenceChangeListener = this
+        findPreference("select_eq_preference")?.onPreferenceChangeListener = this
         findPreference("set_eqparam")?.onPreferenceChangeListener = this
     }
 
@@ -52,7 +54,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             "set_samplerate_preference" -> {
                 mainViewModel.transportControls().sendCustomAction(ACTION_SET_SAMPLERATE,Bundle().apply { putString(
                     Constants.SAMPLERATE, newValue.toString()) })
-                mainViewModel.transportControls().sendCustomAction(Constants.ACTION_REPEAT_SONG, null)
+                //mainViewModel.transportControls().sendCustomAction(Constants.ACTION_REPEAT_SONG, null)
                 Timber.d(newValue.toString())
             }
             "set_enabled_effect_preference" -> {
@@ -82,9 +84,22 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                     Constants.CHAFEN, newValue.toString()) })
                 Timber.d(newValue.toString())
             }
+            "select_eq_preference" -> {
+                if(newValue.toString() != ""){
+                    mainViewModel.transportControls().sendCustomAction(ACTION_SELECT_EQPARAM,Bundle().apply { putString(
+                        Constants.PRESETEQ, newValue.toString()) })
+                }
+                else{
+                    mainViewModel.transportControls().sendCustomAction(ACTION_SET_EQPARAM,Bundle().apply { putString(
+                        Constants.EQPARAM, preference.sharedPreferences.getString("set_eqparam", "")) })
+                }
+                Timber.d(newValue.toString())
+            }
             "set_eqparam" -> {
-                mainViewModel.transportControls().sendCustomAction(ACTION_SET_EQPARAM,Bundle().apply { putString(
-                    Constants.EQPARAM, newValue.toString()) })
+                if(preference.sharedPreferences.getString("select_eq_preference", "") == ""){
+                    mainViewModel.transportControls().sendCustomAction(ACTION_SET_EQPARAM,Bundle().apply { putString(
+                        Constants.EQPARAM, newValue.toString()) })
+                }
                 Timber.d(newValue.toString())
             }
         }

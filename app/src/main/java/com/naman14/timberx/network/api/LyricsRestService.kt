@@ -25,4 +25,9 @@ interface LyricsRestService {
     @GET("/lyric")
     //fun getLyrics(@Query("artist") artist: String, @Query("title") title: String): Observable<String>
     fun getLyrics(@Query("id") id: String): Observable<String>
+
+    @Headers("Cache-Control: public")
+    @GET("/search")
+    //fun getLyrics(@Query("artist") artist: String, @Query("title") title: String): Observable<String>
+    fun getSongId(@Query("keywords") title: String): Observable<String>
 }

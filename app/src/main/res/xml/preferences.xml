@@ -60,7 +60,7 @@
             android:entries="@array/samplerate_values"
             android:entryValues="@array/samplerate_values"
             android:key="set_samplerate_preference"
-            android:summary="选择采样率"
+            android:summary="修改后播放下一首时生效"
             android:title="采样率"
             app:iconSpaceReserved="false" />
 
@@ -71,13 +71,23 @@
             android:title="@string/set_enabled_effect"
             app:iconSpaceReserved="false" />
 
+        <ListPreference
+            android:defaultValue="推荐"
+            android:entries="@array/eq_entries"
+            android:entryValues="@array/eq_values"
+            android:key="select_eq_preference"
+            android:summary="选择预设均衡参数，选择自定义则需手动编辑均衡参数"
+            android:title="预设EQ"
+            app:iconSpaceReserved="false" />
+
         <EditTextPreference
             android:defaultValue="filter 0 80 0.7 2.5\nfilter 1 200 1 -4\nfilter 2 800 1 -7.5\nfilter 3 3980 1 0\nfilter 4 11930 0.7 1"
             android:key="set_eqparam"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="编辑EQ"
+            android:title="编辑自定义EQ"
             app:iconSpaceReserved="false" />
+
         <SwitchPreference
             android:defaultValue="false"
             android:key="set_enabled_stereo_width_preference"

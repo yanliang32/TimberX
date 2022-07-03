@@ -435,11 +435,6 @@ class RealSongPlayer(
 
     override fun setSampleRate(sampleRate: Int) {
         musicPlayer.setSampleRate(sampleRate)
-//        musicPlayer.stop()
-//        updatePlaybackState {
-//            setState(STATE_NONE, 0, 1F)
-//        }
-        //musicPlayer.prepare()
     }
 
     override fun setEnabledEffect(enabledEffect: Boolean) {

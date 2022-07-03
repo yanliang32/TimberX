@@ -23,6 +23,7 @@ import com.naman14.timberx.constants.Constants.ACTION_QUEUE_REORDER
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_QUEUE
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_SONG
 import com.naman14.timberx.constants.Constants.ACTION_RESTORE_MEDIA_SESSION
+import com.naman14.timberx.constants.Constants.ACTION_SELECT_EQPARAM
 import com.naman14.timberx.constants.Constants.ACTION_SET_CHAFEN
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_CHAFEN
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_EFFECT
@@ -37,6 +38,7 @@ import com.naman14.timberx.constants.Constants.ENABLED_CHAFEN
 import com.naman14.timberx.constants.Constants.ENABLED_EFFECT
 import com.naman14.timberx.constants.Constants.ENABLED_STEREO_WIDTH
 import com.naman14.timberx.constants.Constants.EQPARAM
+import com.naman14.timberx.constants.Constants.PRESETEQ
 import com.naman14.timberx.constants.Constants.QUEUE_FROM
 import com.naman14.timberx.constants.Constants.QUEUE_TITLE
 import com.naman14.timberx.constants.Constants.QUEUE_TO
@@ -165,6 +167,10 @@ class MediaSessionCallback(
 
             ACTION_SET_CHAFEN ->{
                 songPlayer.setChafenDelay(extras!!.getString(CHAFEN).toInt())
+            }
+
+            ACTION_SELECT_EQPARAM ->{
+                songPlayer.setEqparam(extras!!.getString(PRESETEQ))
             }
 
             ACTION_SET_EQPARAM ->{

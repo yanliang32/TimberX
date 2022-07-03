@@ -38,7 +38,7 @@ class SearchViewModel(
     val searchLiveData = _searchLiveData
 
     fun search(query: String) {
-        if (query.length >= 3) {
+        if (query.isNotEmpty()) {
             launch {
                 val songs = withContext(IO) {
                     songsRepository.searchSongs(query, 10)

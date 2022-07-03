@@ -65,7 +65,9 @@
                     android:paddingTop="20dp"
                     android:paddingBottom="150dp"
                     android:text="@{lyrics}"
-                    android:textSize="15sp" />
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="2sp"
+                    android:textAlignment="center"/>
 
             </LinearLayout>
         </ScrollView>
