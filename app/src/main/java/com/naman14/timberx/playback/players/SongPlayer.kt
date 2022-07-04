@@ -192,8 +192,9 @@ class RealSongPlayer(
     private var metadataBuilder = MediaMetadataCompat.Builder()
     private var stateBuilder = createDefaultPlaybackState()
 
-    private lateinit var audioManager: AudioManager
+    private var audioManager: AudioManager
     private lateinit var focusRequest: AudioFocusRequest
+    private var mLossTransient = false
 
     private var mSleepTimerDisposable: Disposable? = null
     val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
@@ -323,13 +324,17 @@ class RealSongPlayer(
 
     override fun seekTo(position: Int) {
         Timber.d("seekTo(): $position")
+        var pos: Int
+        pos = position
+        if (position==0)
+            pos=1
         if (isInitialized) {
-            musicPlayer.seekTo(position)
+            musicPlayer.seekTo(pos)
             updatePlaybackState {
                 setState(
-                        mediaSession.controller.playbackState.state,
-                        position.toLong(),
-                        1F
+                    mediaSession.controller.playbackState.state,
+                    pos.toLong(),
+                    1F
                 )
             }
         }
@@ -548,13 +553,19 @@ class RealSongPlayer(
     override fun onAudioFocusChange(focusChange: Int) {
         when (focusChange) {
             AudioManager.AUDIOFOCUS_LOSS -> {
+                mLossTransient=false
                 pause()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                var playing:Boolean = musicPlayer.isPlaying()
                 pause()
+                mLossTransient = playing
             }
             AudioManager.AUDIOFOCUS_GAIN -> {
-               playSong()
+                if(mLossTransient){
+                    playSong()
+                }
+               mLossTransient=false
             }
         }
     }
