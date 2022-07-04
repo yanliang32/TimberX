@@ -19,7 +19,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import com.naman14.timberx.extensions.toIDList
 
 data class QueueData(
-    var queueTitle: String = "All songs",
+    var queueTitle: String = "所有歌曲",
     var queue: LongArray = LongArray(0),
     var currentId: Long = 0
 ) {
@@ -27,7 +27,7 @@ data class QueueData(
         mediaControllerCompat?.let {
             return QueueData(
                     queueTitle = mediaControllerCompat.queueTitle?.toString().orEmpty().let {
-                        if (it.isEmpty()) "All songs" else it
+                        if (it.isEmpty()) "所有歌曲" else it
                     },
                     queue = mediaControllerCompat.queue?.toIDList() ?: LongArray(0),
                     currentId = mediaControllerCompat.metadata?.getString(METADATA_KEY_MEDIA_ID)?.toLong() ?: 0

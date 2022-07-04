@@ -17,7 +17,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="外观设置"
+    <PreferenceCategory android:title="播放器设置"
         app:iconSpaceReserved="false">
         <ListPreference
             android:defaultValue="light"
@@ -37,19 +37,33 @@
             android:title="@string/start_page"
             app:iconSpaceReserved="false" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="true"
             android:key="lastfm_artist_image"
             android:summary="@string/load_artist_image_summary"
             android:title="@string/load_artist_image"
             app:iconSpaceReserved="false" />
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="true"
             android:key="lastfm_album_image"
             android:summary="@string/load_album_image_summary"
             android:title="@string/load_album_image"
             app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_sleep_preference"
+            android:summary="指定时间后停止播放"
+            android:title="开启睡眠定时"
+            app:iconSpaceReserved="false" />
+
+        <SeekBarPreference
+            android:defaultValue="30"
+            android:max="120"
+            android:key="set_sleep_time_preference"
+            android:title="睡眠定时时间（分钟）"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 
 
@@ -95,14 +109,21 @@
             android:title="启用声场"
             app:iconSpaceReserved="false" />
 
-        <ListPreference
+<!--        <ListPreference-->
+<!--            android:defaultValue="10"-->
+<!--            android:entries="@array/stereo_width_values"-->
+<!--            android:entryValues="@array/stereo_width_values"-->
+<!--            android:key="set_stereo_width_preference"-->
+<!--            android:summary="选择声场大小"-->
+<!--            android:title="声场数值"-->
+<!--            app:iconSpaceReserved="false" />-->
+
+        <SeekBarPreference
             android:defaultValue="10"
-            android:entries="@array/stereo_width_values"
-            android:entryValues="@array/stereo_width_values"
+            android:max="20"
             android:key="set_stereo_width_preference"
-            android:summary="选择声场大小"
             android:title="声场数值"
-            app:iconSpaceReserved="false" />
+            app:iconSpaceReserved="false"/>
 
         <SwitchPreference
             android:defaultValue="false"
@@ -111,14 +132,88 @@
             android:title="启用差分"
             app:iconSpaceReserved="false" />
 
-        <ListPreference
+<!--        <ListPreference-->
+<!--            android:defaultValue="20"-->
+<!--            android:entries="@array/enabled_chafen_values"-->
+<!--            android:entryValues="@array/enabled_chafen_values"-->
+<!--            android:key="set_chafen_preference"-->
+<!--            android:summary="选择差分大小"-->
+<!--            android:title="差分数值"-->
+<!--            app:iconSpaceReserved="false" />-->
+
+        <SeekBarPreference
             android:defaultValue="20"
-            android:entries="@array/enabled_chafen_values"
-            android:entryValues="@array/enabled_chafen_values"
+            app:min="1"
+            android:max="50"
             android:key="set_chafen_preference"
-            android:summary="选择差分大小"
             android:title="差分数值"
-            app:iconSpaceReserved="false" />
+            app:iconSpaceReserved="false"/>
+
+
+    </PreferenceCategory>
+    <PreferenceCategory  android:title="硬膝压缩器"
+        app:iconSpaceReserved="false">
+
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_enabled_compressor_preference"
+            android:title="启用硬膝压缩器（压限器）"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="-20"
+            app:min="-50"
+            android:max="0"
+            android:key="set_threshold_preference"
+            android:title="阈值（分贝）"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="2"
+            app:min="1"
+            android:max="10"
+            android:key="set_ratio_preference"
+            android:title="压缩比（比值）"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="4"
+            app:min="0"
+            android:max="100"
+            android:key="set_attack_preference"
+            android:title="启动时间（毫秒）"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="60"
+            app:min="0"
+            android:max="100"
+            android:key="set_release_time_preference"
+            android:title="释放时间（毫秒）"
+            app:iconSpaceReserved="false"/>
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_auto_gain_preference"
+            android:title="启用自动增益"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="0"
+            app:min="-32"
+            android:max="8"
+            android:key="set_gain_preference"
+            android:title="增益（分贝）"
+            app:iconSpaceReserved="false"/>
+
+        <SeekBarPreference
+            android:defaultValue="10"
+            app:min="0"
+            android:max="100"
+            android:key="set_threshold_width_preference"
+            android:title="阈值宽度（毫秒）"
+            app:iconSpaceReserved="false"/>
     </PreferenceCategory>
 
 

@@ -21,7 +21,7 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
 
-private const val API_KEY = "fdb3a51437d4281d4d64964d333531d4"
+private const val API_KEY = "310a60420cff1223638e7586675d346b"
 private const val FORMAT = "json"
 
 private const val BASE_PARAMETERS_ALBUM = "?method=album.getinfo&api_key=$API_KEY&format=$FORMAT"

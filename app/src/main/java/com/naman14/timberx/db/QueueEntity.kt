@@ -27,7 +27,7 @@ data class QueueEntity @Ignore constructor(
     @ColumnInfo(name = "repeat_mode") var repeatMode: Int? = 0,
     @ColumnInfo(name = "shuffle_mode") var shuffleMode: Int? = 0,
     @ColumnInfo(name = "play_state") var playState: Int? = 0,
-    @ColumnInfo(name = "queue_title") var queueTitle: String = "All songs"
+    @ColumnInfo(name = "queue_title") var queueTitle: String = "所有歌曲"
 ) {
     constructor() : this(0, 0, 0, 0, 0, 0, "")
 }

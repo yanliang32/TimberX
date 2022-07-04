@@ -14,6 +14,7 @@
  */
 package com.naman14.timberx.playback.players
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
@@ -26,32 +27,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM_ART
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_DURATION
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_TITLE
+import android.support.v4.media.MediaMetadataCompat.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PAUSE
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_PLAY_PAUSE
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_REPEAT_MODE
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-import android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ALL
-import android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_NONE
-import android.support.v4.media.session.PlaybackStateCompat.REPEAT_MODE_ONE
-import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE
-import android.support.v4.media.session.PlaybackStateCompat.STATE_NONE
-import android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED
-import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
-import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
+import android.support.v4.media.session.PlaybackStateCompat.*
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import com.naman14.timberx.R
@@ -68,7 +47,11 @@ import com.naman14.timberx.extensions.toSongIDs
 import com.naman14.timberx.models.Song
 import com.naman14.timberx.repository.SongsRepository
 import com.naman14.timberx.util.MusicUtils
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 typealias OnIsPlaying = SongPlayer.(playing: Boolean) -> Unit
 
@@ -142,6 +125,53 @@ interface SongPlayer {
     fun setChafenDelay(chafenDelay: Int)
 
     fun setEqparam(eqparam: String)
+
+    /**
+     * 设置播放器是否开启硬膝压缩器。
+     */
+    fun setEnabledCompressor(var1: Boolean)
+
+    /**
+     * 设置播放器硬膝压缩器阈值。
+     */
+    fun setThreshold(var1: Float)
+
+    /**
+     * 设置播放器硬膝压缩器压缩比。
+     */
+    fun setRatio(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器启动时间。
+     */
+    fun setAttack(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器释放时间。
+     */
+    fun setReleaseTime(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器增益。
+     */
+    fun setGain(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器是否开启自动增益。
+     */
+    fun setAutoGain(var1: Boolean)
+
+    /**
+     * 设置播放器。
+     */
+    fun setDetectionType(var1: String?)
+
+    /**
+     * 设置播放器硬膝压缩器阈值宽度。
+     */
+    fun setThresholdWidth(var1: Int)
+
+    fun sleep(var1: Boolean)
 }
 
 class RealSongPlayer(
@@ -165,6 +195,10 @@ class RealSongPlayer(
     private lateinit var audioManager: AudioManager
     private lateinit var focusRequest: AudioFocusRequest
 
+    private var mSleepTimerDisposable: Disposable? = null
+    val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+
+    @SuppressLint("UnspecifiedImmutableFlag")
     private var mediaSession = MediaSessionCompat(context, context.getString(R.string.app_name)).apply {
         setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
         setCallback(MediaSessionCallback(this, this@RealSongPlayer, songsRepository, queueDao))
@@ -180,16 +214,15 @@ class RealSongPlayer(
         queue.setMediaSession(mediaSession)
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
-        setEqparam(sp.getString("set_eqparam",""))
-        sp.getString("set_stereo_width_preference", "10")?.toFloat()
-            ?.let { setStereoWidth(it) };
-        setEnabledEffect(sp.getBoolean("set_enabled_effect_preference", false));
-        setEnabledStereoWidth(sp.getBoolean("set_enabled_stereo_width_preference", false));
+        sp.getString("set_eqparam","")?.toString()?.let { setEqparam(it) }
+        sp.getInt("set_stereo_width_preference", 10).toFloat()
+            .let { setStereoWidth(it) }
+        setEnabledEffect(sp.getBoolean("set_enabled_effect_preference", false))
+        setEnabledStereoWidth(sp.getBoolean("set_enabled_stereo_width_preference", false))
         sp.getString("set_samplerate_preference", "44100")?.toInt()
             ?.let { setSampleRate(it) }
         setEnabledChafen(sp.getBoolean("set_enabled_chafen_preference", false))
-        sp.getString("set_chafen_preference", "20")?.toInt()
-            ?.let { setChafenDelay(it) }
+        setChafenDelay(sp.getInt("set_chafen_preference", 20))
 
         musicPlayer.onPrepared {
             preparedCallback(this@RealSongPlayer)
@@ -461,6 +494,42 @@ class RealSongPlayer(
         musicPlayer.setEqparam(eqparam)
     }
 
+    override fun setEnabledCompressor(var1: Boolean) {
+        musicPlayer.setEnabledCompressor(var1)
+    }
+
+    override fun setThreshold(var1: Float) {
+        musicPlayer.setThreshold(var1)
+    }
+
+    override fun setRatio(var1: Double) {
+        musicPlayer.setRatio(var1)
+    }
+
+    override fun setAttack(var1: Double) {
+        musicPlayer.setAttack(var1)
+    }
+
+    override fun setReleaseTime(var1: Double) {
+        musicPlayer.setReleaseTime(var1)
+    }
+
+    override fun setGain(var1: Double) {
+        musicPlayer.setGain(var1)
+    }
+
+    override fun setAutoGain(var1: Boolean) {
+        musicPlayer.setAutoGain(var1)
+    }
+
+    override fun setDetectionType(var1: String?) {
+        musicPlayer.setDetectionType(var1)
+    }
+
+    override fun setThresholdWidth(var1: Int) {
+        musicPlayer.setThresholdWidth(var1)
+    }
+
     private fun setMetaData(song: Song) {
         // TODO make music utils injectable
         val artwork = MusicUtils.getAlbumArtBitmap(context, song.albumId)
@@ -489,6 +558,37 @@ class RealSongPlayer(
             }
         }
     }
+
+    override fun sleep(var1: Boolean){
+        val time: Long = sp.getInt("set_sleep_time_preference",30).toLong()
+        when(var1){
+            true -> {
+                mSleepTimerDisposable = Observable.timer(time, TimeUnit.MINUTES)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { doAction() }
+            }
+            false -> {
+                disposeLastSleepTimer()
+            }
+        }
+    }
+
+    private fun doAction() {
+        stop()
+        val editor = sp.edit()
+        editor.putBoolean("set_sleep_preference",false)
+        editor.apply()
+        Timber.d("sleepTimeOut")
+    }
+
+    private fun disposeLastSleepTimer() {
+        if (mSleepTimerDisposable == null || mSleepTimerDisposable!!.isDisposed) {
+            return
+        }
+        mSleepTimerDisposable!!.dispose()
+        Timber.d("disposeLastSleepTimer")
+    }
+
 }
 
 private fun createDefaultPlaybackState(): PlaybackStateCompat.Builder {

@@ -18,37 +18,56 @@ import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.STATE_NONE
+import com.naman14.timberx.constants.Constants
 import com.naman14.timberx.constants.Constants.ACTION_PLAY_NEXT
 import com.naman14.timberx.constants.Constants.ACTION_QUEUE_REORDER
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_QUEUE
 import com.naman14.timberx.constants.Constants.ACTION_REPEAT_SONG
 import com.naman14.timberx.constants.Constants.ACTION_RESTORE_MEDIA_SESSION
 import com.naman14.timberx.constants.Constants.ACTION_SELECT_EQPARAM
+import com.naman14.timberx.constants.Constants.ACTION_SET_ATTACK
+import com.naman14.timberx.constants.Constants.ACTION_SET_AUTO_GAIN
 import com.naman14.timberx.constants.Constants.ACTION_SET_CHAFEN
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_CHAFEN
+import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_COMPRESSOR
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_EFFECT
 import com.naman14.timberx.constants.Constants.ACTION_SET_ENABLED_STEREO_WIDTH
 import com.naman14.timberx.constants.Constants.ACTION_SET_EQPARAM
+import com.naman14.timberx.constants.Constants.ACTION_SET_GAIN
 import com.naman14.timberx.constants.Constants.ACTION_SET_MEDIA_STATE
+import com.naman14.timberx.constants.Constants.ACTION_SET_RATIO
+import com.naman14.timberx.constants.Constants.ACTION_SET_RELEASE_TIME
 import com.naman14.timberx.constants.Constants.ACTION_SET_SAMPLERATE
+import com.naman14.timberx.constants.Constants.ACTION_SET_SLEEP
 import com.naman14.timberx.constants.Constants.ACTION_SET_STEREO_WIDTH
+import com.naman14.timberx.constants.Constants.ACTION_SET_THRESHOLD
+import com.naman14.timberx.constants.Constants.ACTION_SET_THRESHOLD_WIDTH
 import com.naman14.timberx.constants.Constants.ACTION_SONG_DELETED
+import com.naman14.timberx.constants.Constants.ATTACK
+import com.naman14.timberx.constants.Constants.AUTO_GAIN
 import com.naman14.timberx.constants.Constants.CHAFEN
 import com.naman14.timberx.constants.Constants.ENABLED_CHAFEN
+import com.naman14.timberx.constants.Constants.ENABLED_COMPRESSOR
 import com.naman14.timberx.constants.Constants.ENABLED_EFFECT
 import com.naman14.timberx.constants.Constants.ENABLED_STEREO_WIDTH
 import com.naman14.timberx.constants.Constants.EQPARAM
+import com.naman14.timberx.constants.Constants.GAIN
 import com.naman14.timberx.constants.Constants.PRESETEQ
 import com.naman14.timberx.constants.Constants.QUEUE_FROM
 import com.naman14.timberx.constants.Constants.QUEUE_TITLE
 import com.naman14.timberx.constants.Constants.QUEUE_TO
+import com.naman14.timberx.constants.Constants.RATIO
+import com.naman14.timberx.constants.Constants.RELEASE_TIME
 import com.naman14.timberx.constants.Constants.REPEAT_MODE
 import com.naman14.timberx.constants.Constants.SAMPLERATE
 import com.naman14.timberx.constants.Constants.SEEK_TO_POS
 import com.naman14.timberx.constants.Constants.SHUFFLE_MODE
+import com.naman14.timberx.constants.Constants.SLEEP
 import com.naman14.timberx.constants.Constants.SONG
 import com.naman14.timberx.constants.Constants.SONGS_LIST
 import com.naman14.timberx.constants.Constants.STEREO_WIDTH
+import com.naman14.timberx.constants.Constants.THRESHOLD
+import com.naman14.timberx.constants.Constants.THRESHOLD_WIDTH
 import com.naman14.timberx.db.QueueDao
 import com.naman14.timberx.models.MediaID
 import com.naman14.timberx.repository.SongsRepository
@@ -146,7 +165,7 @@ class MediaSessionCallback(
             ACTION_RESTORE_MEDIA_SESSION -> restoreMediaSession()
 
             ACTION_SET_SAMPLERATE ->{
-                songPlayer.setSampleRate(extras!!.getString(SAMPLERATE).toInt())
+                extras!!.getString(SAMPLERATE)?.toInt()?.let { songPlayer.setSampleRate(it) }
             }
 
             ACTION_SET_ENABLED_EFFECT ->{
@@ -158,7 +177,7 @@ class MediaSessionCallback(
             }
 
             ACTION_SET_STEREO_WIDTH ->{
-                songPlayer.setStereoWidth(extras!!.getString(STEREO_WIDTH).toFloat())
+                songPlayer.setStereoWidth(extras!!.getInt(STEREO_WIDTH).toFloat())
             }
 
             ACTION_SET_ENABLED_CHAFEN ->{
@@ -166,15 +185,43 @@ class MediaSessionCallback(
             }
 
             ACTION_SET_CHAFEN ->{
-                songPlayer.setChafenDelay(extras!!.getString(CHAFEN).toInt())
+                songPlayer.setChafenDelay(extras!!.getInt(CHAFEN))
             }
 
             ACTION_SELECT_EQPARAM ->{
-                songPlayer.setEqparam(extras!!.getString(PRESETEQ))
+                extras!!.getString(PRESETEQ)?.toString()?.let { songPlayer.setEqparam(it) }
             }
 
             ACTION_SET_EQPARAM ->{
-                songPlayer.setEqparam(extras!!.getString(EQPARAM))
+                extras!!.getString(EQPARAM)?.toString()?.let { songPlayer.setEqparam(it) }
+            }
+
+            ACTION_SET_ENABLED_COMPRESSOR ->{
+                songPlayer.setEnabledCompressor(extras!!.getBoolean(ENABLED_COMPRESSOR))
+            }
+            ACTION_SET_THRESHOLD ->{
+                songPlayer.setThreshold(extras!!.getInt(THRESHOLD).toFloat())
+            }
+            ACTION_SET_RATIO ->{
+                songPlayer.setRatio(extras!!.getInt(RATIO).toDouble())
+            }
+            ACTION_SET_ATTACK ->{
+                songPlayer.setAttack(extras!!.getInt(ATTACK).toDouble())
+            }
+            ACTION_SET_RELEASE_TIME ->{
+                songPlayer.setReleaseTime(extras!!.getInt(RELEASE_TIME).toDouble())
+            }
+            ACTION_SET_AUTO_GAIN ->{
+                songPlayer.setAutoGain(extras!!.getBoolean(AUTO_GAIN))
+            }
+            ACTION_SET_GAIN ->{
+                songPlayer.setGain(extras!!.getInt(GAIN).toDouble())
+            }
+            ACTION_SET_THRESHOLD_WIDTH ->{
+                songPlayer.setThresholdWidth(extras!!.getInt(THRESHOLD_WIDTH))
+            }
+            ACTION_SET_SLEEP -> {
+                songPlayer.sleep(extras!!.getBoolean(SLEEP))
             }
         }
     }

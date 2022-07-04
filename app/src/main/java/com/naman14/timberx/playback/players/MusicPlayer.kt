@@ -15,13 +15,10 @@
 package com.naman14.timberx.playback.players
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.PowerManager
-import android.util.Log
-import androidx.preference.PreferenceManager
 import com.blankj.utilcode.util.UriUtils
 import com.zj.jplayercore.controller.JEqparam
 import com.zj.jplayercore.controller.JPlayer
@@ -81,6 +78,51 @@ interface MusicPlayer {
     fun setChafenDelay(chafenDelay: Int)
 
     fun setEqparam(eqparam: String)
+
+    /**
+     * 设置播放器是否开启硬膝压缩器。
+     */
+    fun setEnabledCompressor(var1: Boolean)
+
+    /**
+     * 设置播放器硬膝压缩器阈值。
+     */
+    fun setThreshold(var1: Float)
+
+    /**
+     * 设置播放器硬膝压缩器压缩比。
+     */
+    fun setRatio(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器启动时间。
+     */
+    fun setAttack(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器释放时间。
+     */
+    fun setReleaseTime(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器增益。
+     */
+    fun setGain(var1: Double)
+
+    /**
+     * 设置播放器硬膝压缩器是否开启自动增益。
+     */
+    fun setAutoGain(var1: Boolean)
+
+    /**
+     * 设置播放器。
+     */
+    fun setDetectionType(var1: String?)
+
+    /**
+     * 设置播放器硬膝压缩器阈值宽度。
+     */
+    fun setThresholdWidth(var1: Int)
 }
 
 class RealMusicPlayer(internal val context: Application) : MusicPlayer,
@@ -239,7 +281,7 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
 
     override fun setEqparam(eqparam: String) {
         jEqparams.clear()
-        var eqList : List<String>
+        val eqList : List<String>
         if(eqparam.contains("\r\n")) {
             eqList = eqparam.split("\r\n")
         }
@@ -264,10 +306,56 @@ class RealMusicPlayer(internal val context: Application) : MusicPlayer,
 
             }
         }
-        if (jEqparams != null && jEqparams.size>0) {
+        if (jEqparams.size>0) {
             player.loadEQ(jEqparams)
         }
         Timber.d("setEqparam: $eqparam")
+    }
+
+    override fun setEnabledCompressor(var1: Boolean) {
+        JPlayer.jConfig.isEnabledCompressor = var1
+
+        Timber.d("setEnabledCompressor: $var1")
+    }
+
+    override fun setThreshold(var1: Float) {
+        JPlayer.jConfig.setThreshold(var1)
+        Timber.d("setThreshold: $var1")
+    }
+
+    override fun setRatio(var1: Double) {
+        JPlayer.jConfig.setRatio(var1)
+        Timber.d("setRatio: $var1")
+    }
+
+    override fun setAttack(var1: Double) {
+        JPlayer.jConfig.setAttack(var1)
+        Timber.d("setAttack: $var1")
+    }
+
+    override fun setReleaseTime(var1: Double) {
+        JPlayer.jConfig.setRelease(var1)
+        Timber.d("setReleaseTime: $var1")
+    }
+
+    override fun setGain(var1: Double) {
+        JPlayer.jConfig.setGain(var1)
+        Timber.d("setGain: $var1")
+    }
+
+    override fun setAutoGain(var1: Boolean) {
+        JPlayer.jConfig.isAutoGain = var1
+        Timber.d("setAutoGain: $var1")
+    }
+
+    override fun setDetectionType(var1: String?) {
+        JPlayer.jConfig.setDetectionType(var1)
+        Timber.d("setDetectionType: $var1")
+    }
+
+    override fun setThresholdWidth(var1: Int) {
+        JPlayer.jConfig.setThresholdWidth(var1)
+        Timber.d("setThresholdWidth: $var1")
     }
 }
 
@@ -275,10 +363,10 @@ private fun createPlayer(owner: RealMusicPlayer): JPlayer {
 
     return JPlayer().apply {
         setWakeMode(owner.context, PowerManager.PARTIAL_WAKE_LOCK)
-        val attr = AudioAttributes.Builder().apply {
-            setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            setUsage(AudioAttributes.USAGE_MEDIA)
-        }.build()
+//        val attr = AudioAttributes.Builder().apply {
+//            setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+//            setUsage(AudioAttributes.USAGE_MEDIA)
+//        }.build()
         //createAudioTrack(attr)
         setOnPreparedListener(owner)
         setOnCompletionListener(owner)

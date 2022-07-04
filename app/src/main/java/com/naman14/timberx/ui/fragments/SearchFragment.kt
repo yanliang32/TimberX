@@ -52,7 +52,7 @@ class SearchFragment : BaseNowPlayingFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = inflater.inflateWithBinding(R.layout.fragment_search, container)
         return binding.root
     }
@@ -88,7 +88,7 @@ class SearchFragment : BaseNowPlayingFragment() {
 
         binding.rvSongs.addOnItemClick { position: Int, _: View ->
             songAdapter.getSongForPosition(position)?.let { song ->
-                val extras = getExtraBundle(songAdapter.songs.toSongIds(), "All songs")
+                val extras = getExtraBundle(songAdapter.songs.toSongIds(), "所有歌曲")
                 mainViewModel.mediaItemClicked(song, extras)
             }
         }
