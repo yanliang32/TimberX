@@ -32,17 +32,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPS
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_DRAGGING
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.naman14.timberx.R
+import com.naman14.timberx.constants.Constants
 import com.naman14.timberx.constants.Constants.ACTION_CAST_CONNECTED
 import com.naman14.timberx.constants.Constants.ACTION_CAST_DISCONNECTED
 import com.naman14.timberx.constants.Constants.ACTION_RESTORE_MEDIA_SESSION
 import com.naman14.timberx.constants.Constants.NOW_PLAYING
 import com.naman14.timberx.databinding.LayoutBottomsheetControlsBinding
-import com.naman14.timberx.extensions.addFragment
-import com.naman14.timberx.extensions.hide
-import com.naman14.timberx.extensions.inflateWithBinding
-import com.naman14.timberx.extensions.map
-import com.naman14.timberx.extensions.observe
-import com.naman14.timberx.extensions.show
+import com.naman14.timberx.extensions.*
 import com.naman14.timberx.models.CastStatus
 import com.naman14.timberx.models.CastStatus.Companion.STATUS_PLAYING
 import com.naman14.timberx.network.models.ArtworkSize
@@ -61,7 +57,7 @@ class BottomControlsFragment : BaseNowPlayingFragment(), BottomSheetListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = inflater.inflateWithBinding(R.layout.layout_bottomsheet_controls, container)
         return binding.root
     }
@@ -143,7 +139,23 @@ class BottomControlsFragment : BaseNowPlayingFragment(), BottomSheetListener {
             if (artist != null && title != null && mainActivity != null) {
                 mainActivity.collapseBottomSheet()
                 Handler().postDelayed({
-                    mainActivity.addFragment(fragment = LyricsFragment.newInstance(artist, title))
+                    val lyricFragment = mainActivity.supportFragmentManager.findFragmentByTag(
+                        Constants.LYRIC
+                    )
+                    val nowPlayFragment = mainActivity.supportFragmentManager.findFragmentByTag(NOW_PLAYING)
+                    if(lyricFragment!=null){
+                        mainActivity.supportFragmentManager.beginTransaction().apply {
+                            if (nowPlayFragment != null) {
+                                hide(nowPlayFragment)
+                            }
+                            show(lyricFragment)
+                            commit()
+                        }
+                    }
+                    else
+                    {
+                        mainActivity.addFragment(fragment = LyricsFragment.newInstance(artist, title), tag = Constants.LYRIC)
+                    }
                 }, 200)
             }
         }
@@ -166,7 +178,7 @@ class BottomControlsFragment : BaseNowPlayingFragment(), BottomSheetListener {
             if (it.isCasting) {
                 isCasting = true
 
-                mainViewModel.castProgressLiveData.observe(this, castProgressObserver)
+                mainViewModel.castProgressLiveData.observe(viewLifecycleOwner, castProgressObserver)
                 setLastFmAlbumImage(binding.bottomContolsAlbumart, it.castSongArtist, it.castSongAlbum, ArtworkSize.SMALL, it.castAlbumId.toLong())
 
                 binding.songArtist.text = getString(R.string.casting_to_x, it.castDeviceName)
@@ -195,7 +207,7 @@ class BottomControlsFragment : BaseNowPlayingFragment(), BottomSheetListener {
                 .observe(this) {
                     when (it) {
                         ACTION_CAST_CONNECTED -> {
-                            mainViewModel.castLiveData.observe(this, castStatusObserver)
+                            mainViewModel.castLiveData.observe(viewLifecycleOwner, castStatusObserver)
                         }
                         ACTION_CAST_DISCONNECTED -> {
                             isCasting = false

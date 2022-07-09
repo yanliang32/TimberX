@@ -38,14 +38,21 @@
             app:iconSpaceReserved="false" />
 
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
+            android:key="lyric_download"
+            android:summary="当无法加载本地歌词时从网络下载歌词到本地"
+            android:title="允许下载网络歌词"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            android:defaultValue="false"
             android:key="lastfm_artist_image"
             android:summary="@string/load_artist_image_summary"
             android:title="@string/load_artist_image"
             app:iconSpaceReserved="false" />
 
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="lastfm_album_image"
             android:summary="@string/load_album_image_summary"
             android:title="@string/load_album_image"

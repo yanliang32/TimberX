@@ -197,7 +197,7 @@ class RealSongPlayer(
     private var mLossTransient = false
 
     private var mSleepTimerDisposable: Disposable? = null
-    val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+    val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private var mediaSession = MediaSessionCompat(context, context.getString(R.string.app_name)).apply {
@@ -557,7 +557,7 @@ class RealSongPlayer(
                 pause()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                var playing:Boolean = musicPlayer.isPlaying()
+                val playing:Boolean = musicPlayer.isPlaying()
                 pause()
                 mLossTransient = playing
             }

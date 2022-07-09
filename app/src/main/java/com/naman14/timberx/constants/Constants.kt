@@ -56,6 +56,7 @@ object Constants {
     const val SHUFFLE_MODE = "shuffle_mode"
     const val CATEGORY_SONG_DATA = "category_song_data"
     const val NOW_PLAYING = "now_playing"
+    const val LYRIC = "lyric"
     const val ACTION_PLAY_PAUSE = "action_play_pause"
     const val ACTION_NEXT = "action_next"
     const val ACTION_PREVIOUS = "action_previous"

@@ -54,6 +54,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
     implementation 'com.blankj:utilcodex:1.30.6'
+    implementation 'com.github.zhengken:LyricViewDemo:v1.2'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"

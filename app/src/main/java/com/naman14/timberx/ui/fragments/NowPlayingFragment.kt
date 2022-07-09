@@ -27,11 +27,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.naman14.timberx.R
+import com.naman14.timberx.constants.Constants
+import com.naman14.timberx.constants.Constants.LYRIC
+import com.naman14.timberx.constants.Constants.NOW_PLAYING
 import com.naman14.timberx.databinding.FragmentNowPlayingBinding
-import com.naman14.timberx.extensions.addFragment
-import com.naman14.timberx.extensions.inflateWithBinding
-import com.naman14.timberx.extensions.observe
-import com.naman14.timberx.extensions.safeActivity
+import com.naman14.timberx.extensions.*
 import com.naman14.timberx.models.QueueData
 import com.naman14.timberx.network.models.ArtworkSize
 import com.naman14.timberx.repository.SongsRepository
@@ -51,7 +51,7 @@ class NowPlayingFragment : BaseNowPlayingFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = inflater.inflateWithBinding(R.layout.fragment_now_playing, container)
         return binding.root
     }
@@ -133,7 +133,22 @@ class NowPlayingFragment : BaseNowPlayingFragment() {
             val artist = currentSong?.artist
             val title = currentSong?.title
             if (artist != null && title != null) {
-                safeActivity.addFragment(fragment = LyricsFragment.newInstance(artist, title))
+                val lyricFragment = safeActivity.supportFragmentManager.findFragmentByTag(LYRIC)
+                val nowPlayFragment = safeActivity.supportFragmentManager.findFragmentByTag(NOW_PLAYING)
+                if(lyricFragment!=null){
+                    safeActivity.supportFragmentManager.beginTransaction().apply {
+                        if (nowPlayFragment != null) {
+                            hide(nowPlayFragment)
+                        }
+                        show(lyricFragment)
+                        commit()
+                    }
+                }
+                else
+                {
+                    safeActivity.addFragment(fragment = LyricsFragment.newInstance(artist, title), tag = LYRIC)
+                }
+
             }
         }
     }
